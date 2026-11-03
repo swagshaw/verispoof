@@ -51,7 +51,7 @@ This repository holds the **inference package** (`verispoof`), the [project page
 | Model weights: [VeriSpoof-Plus](https://huggingface.co/AustinXiao/VeriSpoof-Plus), [VeriSpoof-Base](https://huggingface.co/AustinXiao/VeriSpoof-Base) | ✅ released |
 | Interactive demo: [Hugging Face Space](https://huggingface.co/spaces/AustinXiao/VeriSpoof-demo) | ✅ released |
 | Evaluation suite: [VeriSpoof-Bench](https://huggingface.co/datasets/AustinXiao/VeriSpoof-Bench) (lists, labels, audio regeneration, scoring, reference outputs) | ✅ released |
-| Training code (three-stage recipe, question and rationale construction, counterfactual examples), data pipeline and configs | ⏳ with the peer-reviewed version of the paper |
+| Training code | ⏳ coming soon |
 
 Star or watch the repository to be notified.
 
@@ -152,7 +152,7 @@ Detection on Speech-DF-Arena and SpoofRadar uses their official protocols; the s
 ```bibtex
 @techreport{verispoof2026,
   title       = {{VeriSpoof}: Beyond Real or Fake with One Audio {LLM} for Speech Deepfake Detection, Source Verification, and Grounded Reasoning},
-  author      = {Xiao, Yang},
+  author      = {Xiao, Yang and Dang, Ting},
   institution = {The University of Melbourne},
   type        = {Technical Report},
   year        = {2026},

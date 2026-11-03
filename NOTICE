@@ -1,0 +1,19 @@
+VeriSpoof
+Copyright (c) 2026 Yang Xiao, The University of Melbourne.
+Code and model weights are licensed under the Creative Commons Attribution-NonCommercial 4.0 International licence
+(LICENSE).
+
+Third-party components
+- MiniCPM5-2B (https://huggingface.co/openbmb/MiniCPM5-2B), Copyright OpenBMB, Apache License 2.0. The released
+  VeriSpoof models contain a modified copy (LoRA adapters merged); that part remains under Apache-2.0.
+- Qwen3-ASR-1.7B (https://huggingface.co/Qwen/Qwen3-ASR-1.7B), Copyright Alibaba Cloud, Apache License 2.0. The
+  released VeriSpoof models contain a modified copy of its audio encoder (DoRA adapters merged); that part remains
+  under Apache-2.0.
+- verispoof/encoder.py ports the log-mel front end of the Hugging Face transformers Whisper / Qwen3-ASR
+  feature extractors (Apache License 2.0) to batched GPU code.
+Apache License 2.0: https://www.apache.org/licenses/LICENSE-2.0
+
+Data
+No corpus audio is distributed with this repository except the short example clips of the project page (docs/audio/),
+each under its corpus licence as credited on the page. VeriSpoof-Bench lists and labels refer to public corpora, each
+under its own licence.

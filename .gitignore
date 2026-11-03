@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.venv/
+venv/
+.ipynb_checkpoints/
+.DS_Store
+
+# data, checkpoints and evaluation outputs (see README: everything lives under $VERISPOOF_ROOT)
+/data/
+/runs/
+/evaldata/
+/release/
+/logs/
+*.wav
+*.flac
+*.tar
+*.parquet
+*.safetensors
+*.pt
+*.npy

@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "verispoof"
+version = "0.1.0"
+description = "VeriSpoof: one audio LLM for speech deepfake detection, source verification and grounded reasoning"
+readme = "README.md"
+license = {text = "CC-BY-NC-4.0"}
+authors = [{name = "Yang Xiao", email = "yxiao9550@student.unimelb.edu.au"}]
+requires-python = ">=3.10"
+dependencies = [
+  "torch>=2.4",
+  "transformers>=5.13",  # Qwen3-ASR audio tower (transformers.models.qwen3_asr)
+  "safetensors",
+  "huggingface_hub",
+  "soundfile",
+  "librosa",
+  "numpy",
+]
+
+[project.optional-dependencies]
+vllm = ["vllm>=0.30"]  # faster reasoning (verispoof.vllm_backend); tested with 0.30.0
+
+[project.urls]
+Homepage = "https://swagshaw.github.io/verispoof/"
+Repository = "https://github.com/swagshaw/verispoof"
+"Model (Base)" = "https://huggingface.co/AustinXiao/VeriSpoof-Base"
+"Model (Plus)" = "https://huggingface.co/AustinXiao/VeriSpoof-Plus"
+
+[tool.setuptools.packages.find]
+include = ["verispoof"]

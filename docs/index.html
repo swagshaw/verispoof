@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VeriSpoof — beyond real or fake</title>
+<meta name="description" content="VeriSpoof: one audio language model that detects speech deepfakes, verifies their source, describes the channel and explains its decision in lines you can check. 2.14% pooled EER on Speech-DF-Arena, first among open-weight detectors.">
+<meta name="theme-color" content="#000F46">
+<meta property="og:type" content="website">
+<meta property="og:title" content="VeriSpoof — beyond real or fake">
+<meta property="og:description" content="One audio LLM for speech deepfake detection, source verification and grounded reasoning. 2.14% pooled EER on 14 Speech-DF-Arena sets, #1 open-weight.">
+<meta property="og:url" content="https://swagshaw.github.io/verispoof/">
+<meta property="og:image" content="https://swagshaw.github.io/verispoof/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://swagshaw.github.io/verispoof/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css?v=20261102">
+<script>
+  // theme before first paint: "light" | "dark" | absent (follow the system)
+  try { const t = localStorage.getItem("vs-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="#top" aria-label="VeriSpoof home"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8"/><path d="M7 17h3l2-6 3 12 3-9 2 5 2-2h3"/></svg>VeriSpoof</a>
+  <nav>
+    <a href="#examples">Examples</a><a href="#how">How it works</a><a href="#results">Results</a><a href="#use">Use it</a><a href="#cite">Cite</a><a href="tech_report.pdf" target="_blank" rel="noopener">Tech report</a>
+    <a class="pill" href="https://huggingface.co/AustinXiao/VeriSpoof-Plus" target="_blank" rel="noopener">Hugging Face ↗</a>
+    <button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Theme: system"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 0 0 17z"/></svg></button>
+  </nav>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true"><canvas id="heroTokens"></canvas></div>
+  <p class="eyebrow">Open audio LLM for speech forensics</p>
+  <h1>Beyond real<br><span class="hl">or fake.</span></h1>
+  <p class="lede">VeriSpoof is one audio language model that tells you whether speech is a deepfake, <em>which system made
+    it</em>, <em>whether two recordings share a source</em>, what the channel did to it, and <em>why</em> — in short
+    lines that can each be checked against the audio.</p>
+  <div class="cta">
+    <a class="btn primary" href="#examples">▶ Watch it reason</a>
+    <a class="btn" href="https://huggingface.co/AustinXiao/VeriSpoof-Plus" target="_blank" rel="noopener">Models</a>
+    <a class="btn" href="https://huggingface.co/spaces/AustinXiao/VeriSpoof-demo" target="_blank" rel="noopener">Live demo</a>
+    <a class="btn" href="https://github.com/swagshaw/verispoof" target="_blank" rel="noopener">Code</a>
+    <a class="btn" href="https://huggingface.co/datasets/AustinXiao/VeriSpoof-Bench" target="_blank" rel="noopener">Benchmark</a>
+    <a class="btn" href="tech_report.pdf" target="_blank" rel="noopener">Tech report (PDF)</a>
+  </div>
+  <div class="stats">
+    <div class="stat"><b data-count="2.14" data-dec="2" data-suffix="%">2.14%</b><span>pooled EER on 14 Speech-DF-Arena sets<br><strong>#3 of 28 · #1 open-weight</strong></span></div>
+    <div class="stat"><b data-count="6.2" data-dec="1" data-suffix="%">6.2%</b><span>EER deciding if two recordings share a source,<br>generators unseen in training</span></div>
+    <div class="stat"><b data-count="99.6" data-dec="1" data-suffix="%">99.6%</b><span>partial fakes caught after reasoning<br>vs 78.4% one-step (PartialEdit)</span></div>
+    <div class="stat"><b data-count="29.7" data-dec="1" data-suffix="M">29.7M</b><span>trained parameters of 2.85B<br>training fits one 24&nbsp;GB GPU</span></div>
+  </div>
+  <p class="authors">Yang Xiao · The University of Melbourne · Technical report, 2026</p>
+</section>
+
+<section class="section questions" aria-label="What VeriSpoof answers">
+  <div class="qrow">
+    <div class="qchip"><i>01</i><b>Genuine?</b><span>bona fide or spoof, as a score</span></div>
+    <div class="qchip"><i>02</i><b>Which system?</b><span>generator, acoustic model, vocoder</span></div>
+    <div class="qchip"><i>03</i><b>Same source?</b><span>two recordings, one generator?</span></div>
+    <div class="qchip"><i>04</i><b>What channel?</b><span>noise, reverberation, codec</span></div>
+    <div class="qchip"><i>05</i><b>Why?</b><span>checkable lines → decision</span></div>
+  </div>
+  <p class="fine center">One set of weights, no task heads: every answer is a sentence whose likelihood is the score.</p>
+</section>
+
+<section id="examples" class="section">
+  <div class="section-head">
+    <p class="eyebrow">Example gallery</p>
+    <h2>Every line is a claim. <span class="hl">Every claim is checked.</span></h2>
+    <p class="sub">Real test recordings, run offline through the released inference package. Play one, read the
+      one-step answer and the rationale, and see each line checked against waveform measurements and dataset labels —
+      including the ones the model gets wrong.</p>
+  </div>
+
+  <div class="gallery-bar">
+    <div class="chips" id="chips" role="tablist" aria-label="Examples"></div>
+    <div class="seg" id="modelSeg" role="tablist" aria-label="Model">
+      <button class="seg-btn on" data-model="plus" role="tab" aria-selected="true">VeriSpoof-Plus</button>
+      <button class="seg-btn" data-model="base" role="tab" aria-selected="false">VeriSpoof-Base</button>
+    </div>
+  </div>
+
+  <article class="player" id="player">
+    <header class="ex-head">
+      <div>
+        <p class="ex-meta" id="exMeta"></p>
+        <h3 id="exTitle"></h3>
+        <p class="ex-desc" id="exDesc"></p>
+      </div>
+      <span class="truth" id="exTruth"></span>
+    </header>
+
+    <div class="viz">
+      <canvas id="specCanvas" aria-label="Spectrogram with labelled and stated synthetic spans, and the per-token synthetic probability"></canvas>
+      <div class="tip" id="specTip" hidden></div>
+    </div>
+    <div class="controls">
+      <button id="play" class="play" aria-label="Play">▶</button>
+      <div class="time"><span id="tnow">0.00</span><small> / <span id="tdur">0.00</span> s</small></div>
+      <div class="legend">
+        <span><i class="sw lab"></i>labelled synthetic span</span>
+        <span><i class="sw said"></i>span stated by the model</span>
+        <span><i class="sw tok"></i>P(synthetic) per 0.16&nbsp;s token</span>
+      </div>
+    </div>
+
+    <div class="answer-grid">
+      <section class="answer" aria-label="One-step answer">
+        <h4>One-step answer</h4>
+        <div class="meter"><div class="meter-track"><i id="pBar"></i><b></b></div><span class="mono" id="pVal"></span></div>
+        <p class="verdict" id="directVerdict"></p>
+        <p class="fine" id="directNote">score = log p(spoof answer) − log p(bona fide answer)</p>
+        <h4 class="mt">After reasoning</h4>
+        <p class="verdict" id="reasonVerdict"></p>
+        <p class="callout" id="callout" hidden></p>
+        <div class="cf" id="cf"></div>
+      </section>
+      <section class="rationale" aria-label="Grounded rationale">
+        <div class="rat-head">
+          <h4>Grounded rationale <small id="ratModel"></small></h4>
+          <div class="tally" id="tally"></div>
+        </div>
+        <div class="rows" id="rows"></div>
+        <details class="raw"><summary>Raw model output</summary><pre id="rawText"></pre></details>
+      </section>
+    </div>
+    <p class="fine" id="tileNote"></p>
+  </article>
+
+  <div class="pair-head">
+    <h3>Source verification: <span class="hl">same system or not?</span></h3>
+    <div class="chips" id="pairChips" role="tablist" aria-label="Pairs"></div>
+  </div>
+  <article class="player pair" id="pairPlayer">
+    <div class="pair-audio" id="pairAudio"></div>
+    <div class="answer-grid">
+      <section class="answer">
+        <h4>One-step answer <small>“Do Audio A and Audio B come from the same generator?”</small></h4>
+        <div class="meter"><div class="meter-track same"><i id="sBar"></i><b></b></div><span class="mono" id="sVal"></span></div>
+        <p class="verdict" id="sVerdict"></p>
+        <p class="fine">score = log p(yes) − log p(no)</p>
+      </section>
+      <section class="rationale">
+        <div class="rat-head"><h4>Verification rationale <small id="pairModel"></small></h4><div class="tally" id="pairTally"></div></div>
+        <div class="rows" id="pairRows"></div>
+        <details class="raw"><summary>Raw model output</summary><pre id="pairRaw"></pre></details>
+      </section>
+    </div>
+  </article>
+  <p class="fine center credits">Audio: ASVspoof 2019 LA (ODC-By 1.0), PartialEdit (CC BY 4.0), HAD (CC BY 4.0),
+    CodecFake+ (MIT), DFADD (MIT); evaluation splits only, never used in training. Outputs: greedy decoding with the
+    released <code>verispoof</code> package, precomputed offline (<a href="#credits">credits</a>).</p>
+</section>
+
+<section id="how" class="section">
+  <div class="section-head">
+    <p class="eyebrow">How it works</p>
+    <h2>An audio LLM whose answers <span class="hl">are its scores.</span></h2>
+  </div>
+  <figure class="fig wide"><a href="img/fig2.webp" target="_blank" rel="noopener"><img src="img/fig2.webp" width="2400" height="1200" decoding="async" alt="VeriSpoof architecture: a Qwen3-ASR speech encoder with a learned mix of 25 layers feeds an audio tokenizer that outputs 16 utterance tokens and 52 frame tokens of 0.16 s; MiniCPM5-2B reads them and answers questions on authenticity, generator, noise level, same source and why."></a>
+    <figcaption>Audio components turn one recording, or a pair, into utterance tokens and 0.16&nbsp;s frame tokens that an
+      LLM reads; the same weights answer every question. Figure from the tech report.</figcaption></figure>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-num">01 · Perception</div>
+      <h3>Two resolutions of audio</h3>
+      <p>A Qwen3-ASR (AuT) encoder hears an 8&nbsp;s window. A learned mix of all <b>25 layers</b>, adapted with
+        <b>DoRA</b>, feeds a tokenizer with <b>16 utterance tokens</b> (what is constant: the source) and <b>52 frame
+        tokens</b> of 0.16&nbsp;s (what changes: where the fake is), with time marks every 0.8&nbsp;s.</p>
+      <div class="tokviz" aria-hidden="true"><span class="g"></span><span class="f"></span></div>
+    </div>
+    <div class="card">
+      <div class="card-num">02 · Read-out</div>
+      <h3>Answers as scores</h3>
+      <p><b>MiniCPM5-2B</b> with <b>LoRA</b> reads the tokens. No question has its own head: the score is the
+        likelihood of the model's own answer sentence, so it can be thresholded at any operating point.</p>
+      <p class="formula mono">s = log p(<span>spoof answer</span>)<br>&nbsp;&nbsp;− log p(<span>bona fide answer</span>)</p>
+    </div>
+    <div class="card">
+      <div class="card-num">03 · Rationale</div>
+      <h3>Grounded, line by line</h3>
+      <p>Targets are not written by a teacher model. They are computed from the exact window the model hears, so each
+        field has an independent checker:</p>
+      <ul class="checklist">
+        <li><code>OBSERVATIONS</code> ↔ waveform measurements</li>
+        <li><code>CHANNEL_STATUS</code> ↔ logged condition</li>
+        <li><code>LOCALIZATION</code> ↔ labelled spans</li>
+        <li><code>SOURCE_PROFILE</code> ↔ generator metadata</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-num">04 · Faithfulness</div>
+      <h3>Counterfactual training</h3>
+      <p>In 20% of rationale examples the localization is reversed and only the decision that follows is trained. The
+        model never learns to say something false about the audio; it learns that the decision must follow the stated
+        evidence: <b>99.5%</b> of decisions follow an edit form never seen in training.</p>
+    </div>
+  </div>
+
+  <div class="stages" aria-label="Training stages">
+    <div class="stage"><span class="st-n">1</span><div><b>Perception alignment (PA)</b><p>Tokenizer + encoder DoRA learn detection and source questions with the LLM frozen.</p></div></div>
+    <div class="stage"><span class="st-n">2</span><div><b>Forensic question tuning (QT)</b><p>LLM LoRA added; acoustic model, vocoder, condition and pair questions.</p></div></div>
+    <div class="stage"><span class="st-n">3</span><div><b>Grounded rationale tuning (RT)</b><p>Detection and verification rationales plus counterfactuals; QT questions replayed.</p></div></div>
+  </div>
+  <p class="fine center">Only <b>29.7&nbsp;M</b> of 2.85&nbsp;B parameters are trained (tokenizer 17.85&nbsp;M, encoder DoRA
+    3.24&nbsp;M, LLM LoRA 8.60&nbsp;M, per-token head 6&nbsp;k). Base: official training splits of eight corpora plus three
+    partial-spoof corpora (0.38&nbsp;M utterances). Plus: the same recipe with twelve more corpora (4.0&nbsp;M more utterances).</p>
+
+  <details class="more">
+    <summary>Every question and both rationale formats</summary>
+    <figure class="fig"><img src="img/tr_questions.webp" width="2000" height="1920" loading="lazy" alt="The question templates VeriSpoof answers, with example answers: authenticity, generator, recording condition, acoustic model or vocoder, same source, and the detection and verification rationale formats.">
+      <figcaption>Question templates with example answers (tech report, Figure 4).</figcaption></figure>
+  </details>
+</section>
+
+<section id="results" class="section">
+  <div class="section-head">
+    <p class="eyebrow">Results</p>
+    <h2>Third of 28 on Speech-DF-Arena. <span class="hl">First with open weights.</span></h2>
+    <p class="sub">Every line of the 14 official Speech-DF-Arena protocols, scored with the model's own answer.
+      Pooled EER uses one threshold over all 2.34&nbsp;M trials — the board's ranking.</p>
+  </div>
+
+  <div class="panel">
+    <div class="panel-bar">
+      <h4>Speech-DF-Arena, 14 sets <small>EER (%), lower is better · public snapshot of 31 Oct 2026 with both VeriSpoof models inserted</small></h4>
+      <div class="filters">
+        <div class="seg small" id="arenaMetric" role="tablist" aria-label="Metric">
+          <button class="seg-btn on" data-v="pooled">Pooled</button><button class="seg-btn" data-v="mean">Mean of sets</button>
+        </div>
+        <div class="seg small" id="arenaFilter" role="tablist" aria-label="Systems">
+          <button class="seg-btn on" data-v="all">All</button><button class="seg-btn" data-v="open">Open weights</button>
+        </div>
+      </div>
+    </div>
+    <div class="arena" id="arena"></div>
+    <p class="fine">27 systems on the public board plus both VeriSpoof models. Inserted alone, each model ranks among 28: Plus third, Base fourth.</p>
+    <div class="key"><span><i class="k plus"></i>VeriSpoof-Plus</span><span><i class="k base"></i>VeriSpoof-Base</span><span><i class="k prop"></i>proprietary</span><span><i class="k open"></i>open weights</span></div>
+  </div>
+
+  <details class="more" open>
+    <summary>Per-set EER table <small>(click a column to sort)</small></summary>
+    <div class="table-wrap"><table class="sets" id="setTable"></table></div>
+    <p class="fine">Table 2 of the tech report. Teffic-Audio from its paper; ‡ from SpoofRadar, whose pooled EER covers other sets. Best per column in bold.</p>
+  </details>
+
+  <div class="bench-grid">
+    <div class="panel">
+      <h4>SpoofRadar v1.0, 16 sets <small>pooled EER (%) · lower is better</small></h4>
+      <div class="hbars" id="radar"></div>
+      <p class="fine">Both models beat every open-weight system on the published leaderboard (best: DF Arena 500M, 9.96%).
+        Plus: ACC 95.96 · macro-F1 94.54 · mean set EER 1.65.</p>
+    </div>
+    <div class="panel">
+      <h4>Same source? <small>EER (%) on spoof–spoof pairs · lower is better</small></h4>
+      <div class="gbars" id="source"></div>
+      <div class="key"><span><i class="k probe"></i>frozen probe (DF-Arena-1B)</span><span><i class="k base"></i>Base</span><span><i class="k plus"></i>Plus</span></div>
+    </div>
+  </div>
+
+  <div class="attr-tiles" id="attrTiles"></div>
+
+  <div class="bench-grid">
+    <div class="panel">
+      <div class="panel-bar">
+        <h4>Reasoning catches what one answer misses <small>decision accuracy (%) on the same 500 recordings</small></h4>
+        <div class="seg small" id="reasonModel" role="tablist" aria-label="Model">
+          <button class="seg-btn on" data-v="base">Base</button><button class="seg-btn" data-v="plus">Plus</button>
+        </div>
+      </div>
+      <div class="dumb" id="reason"></div>
+      <div class="key"><span><i class="k probe"></i>one-step answer</span><span><i class="k plus"></i>after reasoning</span></div>
+    </div>
+    <div class="panel">
+      <h4>The decision follows the stated evidence <small>% of decisions that follow a reworded, inverted localization never seen in training · Base</small></h4>
+      <div class="dumb" id="faith"></div>
+      <div class="key"><span><i class="k probe"></i>without counterfactual training</span><span><i class="k plus"></i>with</span></div>
+    </div>
+  </div>
+  <p class="fine center">Numbers from the <a href="tech_report.pdf" target="_blank" rel="noopener">technical report</a>; protocols, lists and
+    scoring scripts in <a href="https://huggingface.co/datasets/AustinXiao/VeriSpoof-Bench" target="_blank" rel="noopener">VeriSpoof-Bench</a>.</p>
+</section>
+
+<section id="use" class="section">
+  <div class="section-head">
+    <p class="eyebrow">Use it</p>
+    <h2>Four lines to a verdict <span class="hl">you can audit.</span></h2>
+  </div>
+  <div class="code">
+    <div class="tabs" role="tablist">
+      <button class="tab on" data-tab="install">Install</button><button class="tab" data-tab="py">Python</button><button class="tab" data-tab="vllm">vLLM</button>
+      <button class="copy" id="copy" type="button">Copy</button>
+    </div>
+<pre data-tab="install" class="on"><code><span class="c"># CUDA GPU with about 12 GB; weights download on first use</span>
+hf download AustinXiao/VeriSpoof-Plus --include "code/*" --local-dir verispoof
+pip install ./verispoof/code</code></pre>
+<pre data-tab="py"><code>from verispoof import VeriSpoof
+
+model = VeriSpoof.from_pretrained("AustinXiao/VeriSpoof-Plus")   <span class="c"># or "AustinXiao/VeriSpoof-Base"</span>
+
+model.detect("sample.wav")              <span class="c"># {'label': 'spoof', 'score': log p(spoof) - log p(bona fide)}</span>
+r = model.explain("sample.wav")         <span class="c"># grounded rationale + per-token synthetic probability</span>
+print(r["text"])                        <span class="c"># OBSERVATIONS / CHANNEL_STATUS / LOCALIZATION / SOURCE_PROFILE / DECISION</span>
+r["decision"], r["spans"], r["token_prob"]
+
+model.same_source("a.wav", "b.wav", level="generator")   <span class="c"># also "acoustic_model", "vocoder"</span>
+model.compare("a.wav", "b.wav")                          <span class="c"># verification rationale</span>
+model.condition("sample.wav", attr="codec")              <span class="c"># also "noise", "reverb"</span>
+model.generator("sample.wav", ["XTTS-v2", "Bark", "VITS"])  <span class="c"># candidates you supply</span></code></pre>
+<pre data-tab="vllm"><code><span class="c"># pip install "./verispoof/code[vllm]"  ·  rationales for many files, about 46x faster in batches</span>
+from verispoof.vllm_backend import VeriSpoofVLLM
+
+if __name__ == "__main__":          <span class="c"># vLLM starts its engine in a separate process</span>
+    m = VeriSpoofVLLM.from_pretrained("AustinXiao/VeriSpoof-Plus")
+    results = m.explain(["a.wav", "b.wav", "c.wav"])          <span class="c"># batched</span>
+    pairs = m.compare([("a.wav", "b.wav"), ("c.wav", "d.wav")])</code></pre>
+  </div>
+  <div class="links">
+    <a class="lcard" href="https://huggingface.co/spaces/AustinXiao/VeriSpoof-demo" target="_blank" rel="noopener"><b>Live demo ↗</b><span>Upload a recording: verdict, rationale and per-token profile. Plus by default, Base selectable.</span></a>
+    <a class="lcard" href="https://huggingface.co/AustinXiao/VeriSpoof-Plus" target="_blank" rel="noopener"><b>VeriSpoof-Plus ↗</b><span>The strongest model: 2.14% pooled EER, 6.2% same-source EER on unseen generators.</span></a>
+    <a class="lcard" href="https://huggingface.co/AustinXiao/VeriSpoof-Base" target="_blank" rel="noopener"><b>VeriSpoof-Base ↗</b><span>Official training splits only; the model of all controlled studies. 4.43% pooled EER.</span></a>
+    <a class="lcard" href="https://github.com/swagshaw/verispoof" target="_blank" rel="noopener"><b>Code ↗</b><span>The pip-installable inference package with a vLLM backend. Training code follows with the peer-reviewed paper.</span></a>
+    <a class="lcard" href="https://huggingface.co/datasets/AustinXiao/VeriSpoof-Bench" target="_blank" rel="noopener"><b>VeriSpoof-Bench ↗</b><span>Lists, labels and scoring scripts for source verification, channel, grounded reasoning, localization and faithfulness.</span></a>
+  </div>
+  <p class="fine center">Intended for research on deepfake detection, source tracing and explainable forensics. A forensic
+    decision should combine this score with other evidence and human review. When deploying on a new language or domain,
+    set the threshold on genuine speech of that domain.</p>
+</section>
+
+<section id="cite" class="section">
+  <div class="section-head">
+    <p class="eyebrow">Cite</p>
+    <h2>If VeriSpoof helps your work</h2>
+  </div>
+  <div class="code cite">
+    <div class="tabs"><span class="tab on">BibTeX</span><button class="copy" id="copyCite" type="button">Copy</button></div>
+<pre class="on" id="bibtex"><code>@techreport{verispoof2026,
+  title       = {{VeriSpoof}: Beyond Real or Fake with One Audio {LLM} for Speech Deepfake Detection, Source Verification, and Grounded Reasoning},
+  author      = {Xiao, Yang},
+  institution = {The University of Melbourne},
+  type        = {Technical Report},
+  year        = {2026},
+  url         = {https://github.com/swagshaw/verispoof/blob/main/tech_report.pdf}
+}</code></pre>
+  </div>
+
+  <div class="about" id="credits">
+    <div>
+      <h4>License</h4>
+      <p>VeriSpoof weights and code: <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>
+        (non-commercial). The base models keep their own license: MiniCPM5-2B and Qwen3-ASR-1.7B, Apache-2.0.</p>
+    </div>
+    <div>
+      <h4>Gallery audio</h4>
+      <p>Evaluation recordings, redistributed under their licenses:
+        <a href="https://datashare.ed.ac.uk/handle/10283/3336" target="_blank" rel="noopener">ASVspoof 2019 LA</a> (ODC-By 1.0),
+        PartialEdit (CC BY 4.0), HAD (CC BY 4.0), CodecFake+ (MIT) and DFADD (MIT). PartialEdit and DFADD build on VCTK
+        (CC BY 4.0). Corpus papers are cited in the tech report.</p>
+    </div>
+    <div>
+      <h4>Acknowledgements</h4>
+      <p>Experiments used computational resources of the National Computational Infrastructure (NCI Australia) and of
+        the University of Melbourne. Generative AI tools were used to assist with writing code, running and summarising
+        experiments, and drafting and editing the report and this page; the authors reviewed and take responsibility for all content.</p>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <p>Yang Xiao, The University of Melbourne<br><a href="mailto:yxiao9550@student.unimelb.edu.au">yxiao9550@student.unimelb.edu.au</a></p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <p><b>VeriSpoof</b> · weights and code under CC BY-NC 4.0 ·
+    <a href="https://huggingface.co/AustinXiao/VeriSpoof-Plus" target="_blank" rel="noopener">Hugging Face</a> ·
+    <a href="https://github.com/swagshaw/verispoof" target="_blank" rel="noopener">GitHub</a> ·
+    <a href="tech_report.pdf" target="_blank" rel="noopener">technical report (PDF)</a> ·
+    <a href="https://huggingface.co/spaces/AustinXiao/VeriSpoof-demo" target="_blank" rel="noopener">demo</a></p>
+  <p class="fine">Everything on this page was precomputed offline. Leaderboard numbers: the public
+    Speech-DF-Arena snapshot of 31 Oct 2026 and the published SpoofRadar v1.0 leaderboard.</p>
+</footer>
+<script src="app.js?v=20261102"></script>
+</body>
+</html>

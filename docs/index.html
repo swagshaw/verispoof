@@ -8,18 +8,22 @@
 <meta name="theme-color" content="#000F46">
 <meta property="og:type" content="website">
 <meta property="og:title" content="VeriSpoof — beyond real or fake">
-<meta property="og:description" content="One audio LLM for speech deepfake detection, source verification and grounded reasoning. 2.14% pooled EER on 14 Speech-DF-Arena sets, #1 open-weight.">
+<meta property="og:description" content="Beyond real or fake: one unified audio LLM for speech deepfake forensics. 2.14% pooled EER on 14 Speech-DF-Arena sets, #1 open-weight.">
 <meta property="og:url" content="https://swagshaw.github.io/verispoof/">
 <meta property="og:image" content="https://swagshaw.github.io/verispoof/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:video" content="https://swagshaw.github.io/verispoof/film/verispoof_film_720p.mp4">
+<meta property="og:video:type" content="video/mp4">
+<meta property="og:video:width" content="1280">
+<meta property="og:video:height" content="720">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://swagshaw.github.io/verispoof/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=20261102">
+<link rel="stylesheet" href="style.css?v=20261103">
 <script>
   // theme before first paint: "light" | "dark" | absent (follow the system)
   try { const t = localStorage.getItem("vs-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
@@ -29,7 +33,7 @@
 <header class="nav">
   <a class="brand" href="#top" aria-label="VeriSpoof home"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8"/><path d="M7 17h3l2-6 3 12 3-9 2 5 2-2h3"/></svg>VeriSpoof</a>
   <nav>
-    <a href="#examples">Examples</a><a href="#how">How it works</a><a href="#results">Results</a><a href="#use">Use it</a><a href="#cite">Cite</a><a href="tech_report.pdf" target="_blank" rel="noopener">Tech report</a>
+    <a href="#film">Film</a><a href="#examples">Examples</a><a href="#how">How it works</a><a href="#results">Results</a><a href="#use">Use it</a><a href="#cite">Cite</a><a href="https://arxiv.org/abs/2611.04634" target="_blank" rel="noopener">Tech report</a>
     <a class="pill" href="https://huggingface.co/AustinXiao/VeriSpoof-Plus" target="_blank" rel="noopener">Hugging Face ↗</a>
     <button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Theme: system"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 0 0 17z"/></svg></button>
   </nav>
@@ -44,13 +48,19 @@
     it</em>, <em>whether two recordings share a source</em>, what the channel did to it, and <em>why</em> — in short
     lines that can each be checked against the audio.</p>
   <div class="cta">
-    <a class="btn primary" href="#examples">▶ Watch it reason</a>
+    <a class="btn primary" href="#film">▶ Watch the film · 1:59</a>
+    <a class="btn" href="#examples">See it reason</a>
     <a class="btn" href="https://huggingface.co/AustinXiao/VeriSpoof-Plus" target="_blank" rel="noopener">Models</a>
     <a class="btn" href="https://huggingface.co/spaces/AustinXiao/VeriSpoof-demo" target="_blank" rel="noopener">Live demo</a>
     <a class="btn" href="https://github.com/swagshaw/verispoof" target="_blank" rel="noopener">Code</a>
     <a class="btn" href="https://huggingface.co/datasets/AustinXiao/VeriSpoof-Bench" target="_blank" rel="noopener">Benchmark</a>
-    <a class="btn" href="tech_report.pdf" target="_blank" rel="noopener">Tech report (PDF)</a>
+    <a class="btn" href="https://arxiv.org/abs/2611.04634" target="_blank" rel="noopener">Tech report (arXiv)</a>
   </div>
+  <figure class="hero-cover">
+    <video autoplay muted loop playsinline preload="auto" poster="cover/cover_poster.jpg" aria-label="VeriSpoof in 12 seconds: it finds the synthesized word, answers every forensic question with one model">
+      <source src="cover/verispoof_cover_1080p.mp4" type="video/mp4">
+    </video>
+  </figure>
   <div class="stats">
     <div class="stat"><b data-count="2.14" data-dec="2" data-suffix="%">2.14%</b><span>pooled EER on 14 Speech-DF-Arena sets<br><strong>#3 of 28 · #1 open-weight</strong></span></div>
     <div class="stat"><b data-count="6.2" data-dec="1" data-suffix="%">6.2%</b><span>EER deciding if two recordings share a source,<br>generators unseen in training</span></div>
@@ -58,6 +68,22 @@
     <div class="stat"><b data-count="29.7" data-dec="1" data-suffix="M">29.7M</b><span>trained parameters of 2.85B<br>training fits one 24&nbsp;GB GPU</span></div>
   </div>
   <p class="authors">Yang Xiao · The University of Melbourne · Technical report, 2026</p>
+</section>
+
+<section id="film" class="section film">
+  <div class="section-head">
+    <p class="eyebrow">The film · 1:59</p>
+    <h2>One model, every question. <span class="hl">It even catches its creator.</span></h2>
+  </div>
+  <figure class="film-frame">
+    <video controls preload="metadata" playsinline poster="film/film_frame.jpg" aria-label="VeriSpoof, a two-minute film with Chinese and English captions">
+      <source src="film/verispoof_film_720p.mp4" type="video/mp4">
+      <a href="film/verispoof_film_720p.mp4">Download the film (MP4)</a>
+    </video>
+  </figure>
+  <p class="fine center">Captions in Chinese and English. Every model output in the film is a real VeriSpoof output on that clip. The character is AI-generated art.
+    All voices are synthetic, including Yang Xiao&rsquo;s (<a href="#credits">credits</a>) ·
+    <a href="https://huggingface.co/AustinXiao/VeriSpoof-Plus/resolve/main/assets/verispoof_film.mp4" target="_blank" rel="noopener">1080p</a></p>
 </section>
 
 <section class="section questions" aria-label="What VeriSpoof answers">
@@ -76,8 +102,7 @@
     <p class="eyebrow">Example gallery</p>
     <h2>Every line is a claim. <span class="hl">Every claim is checked.</span></h2>
     <p class="sub">Real test recordings, run offline through the released inference package. Play one, read the
-      one-step answer and the rationale, and see each line checked against waveform measurements and dataset labels —
-      including the ones the model gets wrong.</p>
+      one-step answer and the rationale, and see each line checked against waveform measurements and dataset labels.</p>
   </div>
 
   <div class="gallery-bar">
@@ -286,7 +311,7 @@
       <div class="key"><span><i class="k probe"></i>without counterfactual training</span><span><i class="k plus"></i>with</span></div>
     </div>
   </div>
-  <p class="fine center">Numbers from the <a href="tech_report.pdf" target="_blank" rel="noopener">technical report</a>; protocols, lists and
+  <p class="fine center">Numbers from the <a href="https://arxiv.org/abs/2611.04634" target="_blank" rel="noopener">technical report</a>; protocols, lists and
     scoring scripts in <a href="https://huggingface.co/datasets/AustinXiao/VeriSpoof-Bench" target="_blank" rel="noopener">VeriSpoof-Bench</a>.</p>
 </section>
 
@@ -332,8 +357,7 @@ if __name__ == "__main__":          <span class="c"># vLLM starts its engine in 
     <a class="lcard" href="https://huggingface.co/datasets/AustinXiao/VeriSpoof-Bench" target="_blank" rel="noopener"><b>VeriSpoof-Bench ↗</b><span>Lists, labels and scoring scripts for source verification, channel, grounded reasoning, localization and faithfulness.</span></a>
   </div>
   <p class="fine center">Intended for research on deepfake detection, source tracing and explainable forensics. A forensic
-    decision should combine this score with other evidence and human review. When deploying on a new language or domain,
-    set the threshold on genuine speech of that domain.</p>
+    decision should combine this score with other evidence and human review.</p>
 </section>
 
 <section id="cite" class="section">
@@ -343,13 +367,14 @@ if __name__ == "__main__":          <span class="c"># vLLM starts its engine in 
   </div>
   <div class="code cite">
     <div class="tabs"><span class="tab on">BibTeX</span><button class="copy" id="copyCite" type="button">Copy</button></div>
-<pre class="on" id="bibtex"><code>@techreport{verispoof2026,
-  title       = {{VeriSpoof}: Beyond Real or Fake with One Audio {LLM} for Speech Deepfake Detection, Source Verification, and Grounded Reasoning},
-  author      = {Xiao, Yang and Dang, Ting},
-  institution = {The University of Melbourne},
-  type        = {Technical Report},
-  year        = {2026},
-  url         = {https://github.com/swagshaw/verispoof/blob/main/tech_report.pdf}
+<pre class="on" id="bibtex"><code>@misc{verispoof2026,
+  title         = {{VeriSpoof}: Beyond Real or Fake with One Audio {LLM}},
+  author        = {Xiao, Yang and Dang, Ting},
+  year          = {2026},
+  eprint        = {2611.04634},
+  archivePrefix = {arXiv},
+  primaryClass  = {eess.AS},
+  url           = {https://arxiv.org/abs/2611.04634}
 }</code></pre>
   </div>
 
@@ -365,6 +390,13 @@ if __name__ == "__main__":          <span class="c"># vLLM starts its engine in 
         <a href="https://datashare.ed.ac.uk/handle/10283/3336" target="_blank" rel="noopener">ASVspoof 2019 LA</a> (ODC-By 1.0),
         PartialEdit (CC BY 4.0), HAD (CC BY 4.0), CodecFake+ (MIT) and DFADD (MIT). PartialEdit and DFADD build on VCTK
         (CC BY 4.0). Corpus papers are cited in the tech report.</p>
+    </div>
+    <div>
+      <h4>Film</h4>
+      <p>Narration and Yang Xiao&rsquo;s voice are synthetic (Fish Audio). Music &ldquo;78 PULSE&rdquo; by kjartan_abel
+        (CC BY 4.0); sound effects &ldquo;2 Impact Wet&rdquo; by original_sound (CC BY 3.0) and &ldquo;data corrupted&rdquo;
+        by Saltbearer (CC BY 4.0), the rest CC0, via Openverse and Freesound. Recordings from PartialEdit (CC BY 4.0) and MLAAD
+        (CC BY-NC 4.0). Made with HyperFrames.</p>
     </div>
     <div>
       <h4>Acknowledgements</h4>
@@ -384,7 +416,7 @@ if __name__ == "__main__":          <span class="c"># vLLM starts its engine in 
   <p><b>VeriSpoof</b> · weights and code under CC BY-NC 4.0 ·
     <a href="https://huggingface.co/AustinXiao/VeriSpoof-Plus" target="_blank" rel="noopener">Hugging Face</a> ·
     <a href="https://github.com/swagshaw/verispoof" target="_blank" rel="noopener">GitHub</a> ·
-    <a href="tech_report.pdf" target="_blank" rel="noopener">technical report (PDF)</a> ·
+    <a href="https://arxiv.org/abs/2611.04634" target="_blank" rel="noopener">technical report (arXiv)</a> ·
     <a href="https://huggingface.co/spaces/AustinXiao/VeriSpoof-demo" target="_blank" rel="noopener">demo</a></p>
   <p class="fine">Everything on this page was precomputed offline. Leaderboard numbers: the public
     Speech-DF-Arena snapshot of 31 Oct 2026 and the published SpoofRadar v1.0 leaderboard.</p>

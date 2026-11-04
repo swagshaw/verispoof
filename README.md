@@ -1,21 +1,23 @@
 <div align="center">
 
-<a href="https://swagshaw.github.io/verispoof/"><img src="docs/poster.png" alt="VeriSpoof: beyond real or fake" width="100%"></a>
+<a href="https://swagshaw.github.io/verispoof/"><img src="docs/cover/verispoof_cover.gif" alt="VeriSpoof: beyond real or fake" width="100%"></a>
 
 # VeriSpoof
 
-**Beyond real or fake.** One audio LLM for speech deepfake detection, source verification and grounded reasoning.
+**Beyond real or fake: one unified audio LLM for speech deepfake forensics.**
 
 [![Project page](https://img.shields.io/badge/project%20page-live-1d4e9e?style=for-the-badge)](https://swagshaw.github.io/verispoof/)
 [![Speech-DF-Arena](https://img.shields.io/badge/Speech--DF--Arena-%233%20of%2028%20%C2%B7%20%231%20open--weight-000f46?style=for-the-badge)](https://huggingface.co/spaces/Speech-Arena-2025/Speech-DF-Arena)
-[![Tech report](https://img.shields.io/badge/tech%20report-PDF-c0304a?style=for-the-badge&logo=adobeacrobatreader&logoColor=white)](tech_report.pdf)
+[![arXiv](https://img.shields.io/badge/arXiv-2611.04634-b31b1b?style=for-the-badge&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2611.04634)
 [![VeriSpoof-Plus](https://img.shields.io/badge/model-VeriSpoof--Plus-7d97f5?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/AustinXiao/VeriSpoof-Plus)
 [![VeriSpoof-Base](https://img.shields.io/badge/model-VeriSpoof--Base-a9bcff?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/AustinXiao/VeriSpoof-Base)
 [![Demo](https://img.shields.io/badge/demo-HF%20Space-f5b95b?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/spaces/AustinXiao/VeriSpoof-demo)
 [![Benchmark](https://img.shields.io/badge/benchmark-VeriSpoof--Bench-0c7d55?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/datasets/AustinXiao/VeriSpoof-Bench)
 [![License](https://img.shields.io/badge/license-CC%20BY--NC%204.0-lightgrey?style=for-the-badge)](https://creativecommons.org/licenses/by-nc/4.0/)
 
-**[▶ See it reason on real recordings](https://swagshaw.github.io/verispoof/#examples)** · **[Get the model](https://huggingface.co/AustinXiao/VeriSpoof-Plus)** · **[Read the tech report](tech_report.pdf)**
+**[▶ Watch the film (1:59)](https://swagshaw.github.io/verispoof/#film)** · **[See it reason on real recordings](https://swagshaw.github.io/verispoof/#examples)** · **[Get the model](https://huggingface.co/AustinXiao/VeriSpoof-Plus)** · **[Read the tech report](https://arxiv.org/abs/2611.04634)**
+
+<a href="https://swagshaw.github.io/verispoof/#film"><img src="docs/film/film_poster.jpg" alt="Watch the two-minute VeriSpoof film" width="80%"></a>
 
 </div>
 
@@ -43,7 +45,7 @@ Only 29.7 M of its 2.85 B parameters are trained.
   per-token head). The Base recipe takes about 14 GPU-hours on one 48 GB GPU.
 
 This repository holds the **inference package** (`verispoof`), the [project page](https://swagshaw.github.io/verispoof/)
-(`docs/`) and the [technical report](tech_report.pdf). Training code is released in stages:
+(`docs/`) and the [technical report](https://arxiv.org/abs/2611.04634). Training code is released in stages:
 
 | Component | Status |
 |---|---|
@@ -84,7 +86,7 @@ Base: 4.23 / 95.77 / 94.29 / 3.76. The best open-weight system on that board (DF
 
 Rationales catch partial fakes that the one-step answer misses (PartialEdit: 99.6% vs 78.4% for Base), the decision
 follows an edited localization worded as never seen in training in 99.5% of tests, and the reasoning decision of Plus
-is 89.2–99.6% accurate on nine sets. Full tables: [tech report](tech_report.pdf).
+is 89.2–99.6% accurate on nine sets. Full tables: [tech report](https://arxiv.org/abs/2611.04634).
 
 ## Installation
 
@@ -150,13 +152,14 @@ Detection on Speech-DF-Arena and SpoofRadar uses their official protocols; the s
 ## Citation
 
 ```bibtex
-@techreport{verispoof2026,
-  title       = {{VeriSpoof}: Beyond Real or Fake with One Audio {LLM} for Speech Deepfake Detection, Source Verification, and Grounded Reasoning},
-  author      = {Xiao, Yang and Dang, Ting},
-  institution = {The University of Melbourne},
-  type        = {Technical Report},
-  year        = {2026},
-  url         = {https://github.com/swagshaw/verispoof/blob/main/tech_report.pdf}
+@misc{verispoof2026,
+  title         = {{VeriSpoof}: Beyond Real or Fake with One Audio {LLM}},
+  author        = {Xiao, Yang and Dang, Ting},
+  year          = {2026},
+  eprint        = {2611.04634},
+  archivePrefix = {arXiv},
+  primaryClass  = {eess.AS},
+  url           = {https://arxiv.org/abs/2611.04634}
 }
 ```
 
@@ -170,6 +173,8 @@ non-commercial, LibriSeVoc and WaveFake share-alike.
 
 VeriSpoof is a research tool for audio deepfake detection, source tracing and explainable forensics. It should not be
 the only basis for decisions about people; combine its output with other evidence and human review.
+
+**Film credits.** All voices in the film are synthetic (Fish Audio), including Yang Xiao’s. Music “78 PULSE” by kjartan_abel (CC BY 4.0); sound effects “2 Impact Wet” by original_sound (CC BY 3.0) and “data corrupted” by Saltbearer (CC BY 4.0), the rest CC0, via Openverse and Freesound; recordings from PartialEdit (CC BY 4.0) and MLAAD (CC BY-NC 4.0). Every model output shown is a real VeriSpoof output on that clip. The character is AI-generated art.
 
 ## Contact
 

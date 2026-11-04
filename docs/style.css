@@ -364,3 +364,13 @@ footer { max-width: 1160px; margin: 72px auto 0; padding: 28px clamp(16px, 4vw, 
   .gallery-bar .seg-btn { flex: 1; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; animation: none !important; } }
+
+/* the film (section #film, right after the hero) */
+.film { padding-top: 56px; }
+.film-frame { max-width: 1040px; margin: 0 auto; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+  border: 1px solid var(--line); background: #000; aspect-ratio: 16 / 9; }
+.film-frame video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
+
+/* hero cover loop (12 s, silent) */
+.hero-cover { position: relative; max-width: 1040px; margin: 0 auto 48px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); background: #000F46; }
+.hero-cover video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
